@@ -1,12 +1,15 @@
 .commandcode/
 .cortex/
 
+data/*
+
 # Binaries
 /oris
 /orisd
 *.exe
 *.test
 *.out
+bin/*
 
 # IDE
 .idea/
