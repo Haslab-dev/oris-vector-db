@@ -1,0 +1,32 @@
+// Package dense provides dense vector index implementations.
+package dense
+
+// Engine is the interface for dense vector indexing and search.
+type Engine interface {
+	// Insert adds a vector with the given ID.
+	Insert(id uint64, vec []float32) error
+
+	// Delete removes the vector with the given ID.
+	Delete(id uint64) error
+
+	// Search finds the top-k most similar vectors.
+	Search(query []float32, topK int) ([]Result, error)
+
+	// Len returns the number of vectors in the index.
+	Len() int
+}
+
+// Result is a single search result.
+type Result struct {
+	ID    uint64
+	Score float32
+}
+
+// Config holds configuration for a dense engine.
+type Config struct {
+	Dimension      int
+	Distance       string // "cosine", "dot", "euclidean"
+	M              int   // HNSW M parameter (default 16)
+	EfConstruction int   // HNSW efConstruction (default 200)
+	EfSearch       int   // HNSW efSearch (default 100)
+}
