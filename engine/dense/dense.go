@@ -14,7 +14,15 @@ type Engine interface {
 
 	// Len returns the number of vectors in the index.
 	Len() int
+
+	// Rebuild re-inserts all vectors into a fresh index. Useful after
+	// parameter changes or to recover from graph degradation.
+	Rebuild() error
 }
+
+// SmallThreshold is the number of vectors below which a flat index is used.
+// Query it from factory.New to auto-select the right backend.
+var SmallThreshold = 1000
 
 // Result is a single search result.
 type Result struct {

@@ -115,6 +115,11 @@ func (f *Flat) Len() int {
 	return len(f.vectors)
 }
 
+// Rebuild is a no-op for Flat since it has no index structure to rebuild.
+func (f *Flat) Rebuild() error {
+	return nil
+}
+
 func (f *Flat) distFn(a, b []float32) float32 {
 	switch f.metric {
 	case distance.Dot:

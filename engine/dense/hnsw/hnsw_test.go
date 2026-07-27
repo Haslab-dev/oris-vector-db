@@ -4,9 +4,10 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/hasdev/oris/engine/dense"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/hasdev/oris/engine/dense"
 )
 
 func newTestHNSW() *HNSW {
@@ -22,7 +23,6 @@ func newTestHNSW() *HNSW {
 func TestInsertAndSearch(t *testing.T) {
 	h := newTestHNSW()
 
-	// Insert distinct vectors with unique values per axis.
 	for i := 0; i < 20; i++ {
 		vec := make([]float32, 8)
 		vec[0] = float32(i) / 20.0
@@ -33,13 +33,11 @@ func TestInsertAndSearch(t *testing.T) {
 
 	assert.Equal(t, 20, h.Len())
 
-	// Search for a point close to v0.
 	query := []float32{0.9, 0.1, 0, 0, 0, 0, 0, 0}
 	results, err := h.Search(query, 3)
 	require.NoError(t, err)
 	require.GreaterOrEqual(t, len(results), 1)
 
-	// The closest should have a relatively small distance.
 	assert.Less(t, results[0].Score, float32(0.3))
 	assert.GreaterOrEqual(t, results[0].Score, float32(0))
 }
@@ -79,7 +77,6 @@ func TestInsertAndSearchRandom(t *testing.T) {
 		for j := 0; j < dim; j++ {
 			vec[j] = rng.Float32()*2 - 1
 		}
-		// Normalize.
 		var norm float32
 		for _, v := range vec {
 			norm += v * v
@@ -94,7 +91,6 @@ func TestInsertAndSearchRandom(t *testing.T) {
 
 	assert.Equal(t, n, h.Len())
 
-	// Search for the first vector — it should find itself.
 	results, err := h.Search(vectors[0], 10)
 	require.NoError(t, err)
 	require.Len(t, results, 10)
@@ -165,6 +161,28 @@ func TestLargeEFSearch(t *testing.T) {
 	results, err := h.Search([]float32{0.5, 0.5, 0.5, 0.5}, 5)
 	require.NoError(t, err)
 	require.Len(t, results, 5)
+}
+
+func TestRebuild(t *testing.T) {
+	h := newTestHNSW()
+
+	for i := 0; i < 50; i++ {
+		vec := make([]float32, 8)
+		vec[0] = float32(i) / 50.0
+		vec[1] = 1.0 - float32(i)/50.0
+		require.NoError(t, h.Insert(uint64(i), vec))
+	}
+	assert.Equal(t, 50, h.Len())
+
+	err := h.Rebuild()
+	require.NoError(t, err)
+	assert.Equal(t, 50, h.Len())
+
+	query := []float32{0.9, 0.1, 0, 0, 0, 0, 0, 0}
+	results, err := h.Search(query, 5)
+	require.NoError(t, err)
+	require.Len(t, results, 5)
+	assert.Less(t, results[0].Score, float32(0.3))
 }
 
 func sqrt(x float64) float64 {

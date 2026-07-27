@@ -220,6 +220,36 @@ func (h *HNSW) Len() int {
 	return len(h.nodes)
 }
 
+// Rebuild re-inserts all vectors into a fresh HNSW index.
+func (h *HNSW) Rebuild() error {
+	h.mu.Lock()
+
+	// Snapshot current vectors.
+	ids := make([]uint64, 0, len(h.vectors))
+	vecs := make([][]float32, 0, len(h.vectors))
+	for id, vec := range h.vectors {
+		ids = append(ids, id)
+		vecs = append(vecs, vec)
+	}
+
+	// Reset graph.
+	h.entry = 0
+	h.maxLevel = -1
+	h.nodes = make(map[uint64]*node)
+	h.rng = rand.New(rand.NewSource(42))
+	h.levelMult = 1.0 / math.Log(float64(h.M))
+	h.mu.Unlock()
+
+	// Re-insert outside lock to avoid holding during graph construction.
+	for i, id := range ids {
+		if err := h.Insert(id, vecs[i]); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // dist computes the distance between a stored vector and a query.
 func (h *HNSW) distFn(a, b []float32) float32 {
 	switch h.metric {
