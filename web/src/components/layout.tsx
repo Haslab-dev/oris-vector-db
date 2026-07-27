@@ -5,6 +5,7 @@ import {
   Search,
   BarChart3,
   Settings,
+  BookOpen,
 } from "lucide-react"
 import { cn } from "../lib/utils"
 
@@ -13,6 +14,7 @@ const navItems = [
   { icon: Database, label: "Collections", path: "/collections" },
   { icon: Search, label: "Search", path: "/search" },
   { icon: BarChart3, label: "Performance", path: "/performance" },
+  { icon: BookOpen, label: "Docs", path: "/docs" },
   { icon: Settings, label: "Settings", path: "/settings" },
 ]
 

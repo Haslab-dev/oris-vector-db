@@ -6,6 +6,7 @@ import CollectionDetailPage from "./pages/collection-detail"
 import SearchPage from "./pages/search"
 import PerformancePage from "./pages/performance"
 import SettingsPage from "./pages/settings"
+import DocsPage from "./pages/docs"
 
 const rootRoute = createRootRoute({
   component: Layout,
@@ -47,6 +48,12 @@ const settingsRoute = createRoute({
   component: SettingsPage,
 })
 
+const docsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/docs",
+  component: DocsPage,
+})
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   collectionsRoute,
@@ -54,6 +61,7 @@ const routeTree = rootRoute.addChildren([
   searchRoute,
   performanceRoute,
   settingsRoute,
+  docsRoute,
 ])
 
 const history = createHashHistory()
