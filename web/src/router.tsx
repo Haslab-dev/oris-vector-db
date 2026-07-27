@@ -6,6 +6,7 @@ import CollectionDetailPage from "./pages/collection-detail"
 import SearchPage from "./pages/search"
 import PerformancePage from "./pages/performance"
 import SettingsPage from "./pages/settings"
+import PlaygroundPage from "./pages/playground"
 import DocsOverviewPage from "./pages/docs/overview"
 import GettingStartedPage from "./pages/docs/getting-started"
 import ArchitecturePage from "./pages/docs/architecture"
@@ -61,6 +62,12 @@ const docsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/docs",
   component: DocsOverviewPage,
+})
+
+const playgroundRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/playground",
+  component: PlaygroundPage,
 })
 
 const docsGettingStartedRoute = createRoute({
@@ -125,6 +132,7 @@ const routeTree = rootRoute.addChildren([
   performanceRoute,
   settingsRoute,
   docsRoute,
+  playgroundRoute,
   docsGettingStartedRoute,
   docsArchitectureRoute,
   docsDenseEngineRoute,

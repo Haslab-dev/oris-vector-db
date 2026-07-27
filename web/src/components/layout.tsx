@@ -6,11 +6,13 @@ import {
   BarChart3,
   Settings,
   BookOpen,
+  Play,
 } from "lucide-react"
 import { cn } from "../lib/utils"
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
+  { icon: Play, label: "Playground", path: "/playground" },
   { icon: Database, label: "Collections", path: "/collections" },
   { icon: Search, label: "Search", path: "/search" },
   { icon: BarChart3, label: "Performance", path: "/performance" },

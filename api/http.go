@@ -125,7 +125,8 @@ func (s *Server) listCollections(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) createCollection(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		Name string `json:"name"`
+		Name        string `json:"name"`
+		Dimension   int    `json:"dimension"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		jsonError(w, "invalid request: "+err.Error())
@@ -135,6 +136,9 @@ func (s *Server) createCollection(w http.ResponseWriter, r *http.Request) {
 		jsonError(w, "name is required")
 		return
 	}
+	if req.Dimension <= 0 {
+		req.Dimension = s.cfg.Dimension
+	}
 
 	colPath := filepath.Join(s.workspace, req.Name)
 	if _, err := os.Stat(colPath); err == nil {
@@ -142,7 +146,9 @@ func (s *Server) createCollection(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	col, err := Open(colPath, s.cfg)
+	cfg := s.cfg
+	cfg.Dimension = req.Dimension
+	col, err := Open(colPath, cfg)
 	if err != nil {
 		jsonError(w, err.Error())
 		return
