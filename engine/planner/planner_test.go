@@ -90,8 +90,8 @@ func TestSparseOnly(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.Len(t, results, 3)
-	assert.Equal(t, uint64(0), results[0].ID)
-	t.Logf("Sparse results: %+v", results)
+	// Docs 0, 1, 4 all score the same for "hello". Sort is stable enough for this check.
+	assert.Equal(t, float32(0.5389965), results[0].SparseScore)
 }
 
 func TestSparseOnlyWithFilter(t *testing.T) {
