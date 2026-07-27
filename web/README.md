@@ -1,32 +1,82 @@
-# React + TypeScript + Vite
+# Oris Web UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A lightweight, embedded-first web interface for the Oris vector retrieval engine.
 
-Currently, two official plugins are available:
+Built with **React 19** + **Vite 8** + **Tailwind CSS v4** + **TanStack Router**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Quick Start
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+cd web
+bun install
+bun run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Open http://localhost:5173 in your browser.
+
+## Pages
+
+| Page | Route | Description |
+|------|-------|-------------|
+| Dashboard | `/` | Stats overview (collections, vectors, storage, memory) |
+| Collections | `/collections` | List all collections with metadata |
+| Collection Detail | `/collections/$name` | Per-collection stats, segments, and tabs |
+| Search | `/search` | Query playground with result detail panel |
+| Performance | `/performance` | Latency, insert, memory, and storage charts |
+| Settings | `/settings` | Engine and instance configuration |
+
+## Tech Stack
+
+- **React 19** — UI framework
+- **TanStack Router** — type-safe routing with hash history
+- **Tailwind CSS v4** — utility-first styling
+- **Radix UI** — accessible primitives (Tabs, Slot)
+- **Recharts** — charts and visualizations
+- **Lucide React** — icons
+- **shadcn/ui style** — component patterns (Button, Card, Badge)
+
+## Architecture
+
+```
+web/
+├── src/
+│   ├── components/
+│   │   ├── layout.tsx          # App shell with sidebar navigation
+│   │   └── ui/                 # Primitive components (button, card, badge)
+│   ├── lib/
+│   │   └── utils.ts            # cn() utility for className merging
+│   ├── pages/
+│   │   ├── dashboard.tsx
+│   │   ├── collections.tsx
+│   │   ├── collection-detail.tsx
+│   │   ├── search.tsx
+│   │   ├── performance.tsx
+│   │   └── settings.tsx
+│   ├── router.tsx              # Route tree definition
+│   ├── App.tsx                 # Root component
+│   ├── main.tsx                # Entry point
+│   └── index.css               # Tailwind import
+├── index.html
+├── vite.config.ts
+├── tsconfig.json
+└── package.json
+```
+
+## Connecting to Oris Backend
+
+The web UI communicates with the Oris Go HTTP API. Start the API server:
+
+```go
+col, _ := api.Open("/path/to/collection", cfg)
+http.ListenAndServe(":8080", api.NewHTTPServer(col))
+```
+
+Update the API base URL in the search page's `handleSearch` function to point to your server.
+
+## Build for Production
+
+```bash
+bun run build
+```
+
+Output goes to `web/dist/`.
