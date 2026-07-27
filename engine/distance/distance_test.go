@@ -46,15 +46,47 @@ func TestEuclidean(t *testing.T) {
 	assert.InDelta(t, 0, k.Euclidean(a, a), 1e-6)
 }
 
-func TestKernelInterface(t *testing.T) {
-	k := NewKernel()
-	_, ok := k.(*genericKernel)
-	assert.True(t, ok)
-}
-
 func TestTypeString(t *testing.T) {
 	assert.Equal(t, "cosine", Cosine.String())
 	assert.Equal(t, "dot", Dot.String())
 	assert.Equal(t, "euclidean", Euclidean.String())
 	assert.Equal(t, "unknown", Type(99).String())
 }
+
+func TestCPUDetection(t *testing.T) {
+	// CPUInfo should be populated by init().
+	// We can't assert exact features (depends on build machine),
+	// but we can verify the fields are accessible.
+	t.Logf("NEON: %v, AVX2: %v, AVX512F: %v, AVX512BW: %v, SVE: %v",
+		CPUInfo.HasNEON, CPUInfo.HasAVX2, CPUInfo.HasAVX512F, CPUInfo.HasAVX512BW, CPUInfo.HasSVE)
+}
+
+func TestNewKernelReturnsKernel(t *testing.T) {
+	k := NewKernel()
+	assert.NotNil(t, k)
+	// Should be able to do basic calculations.
+	a := []float32{1, 0, 0}
+	b := []float32{0, 1, 0}
+	assert.InDelta(t, 1, k.Cosine(a, b), 1e-6)
+}
+
+func TestBackendRegistration(t *testing.T) {
+	// Register a test backend and verify it's selected.
+	RegisterBackend(Backend{
+		Name: "test",
+		Kernel: &testKernel{},
+		Checker: func() bool { return true },
+	})
+
+	k := NewKernel()
+	tk, ok := k.(*testKernel)
+	assert.True(t, ok, "NewKernel should return the most recently registered valid backend")
+	_ = tk
+}
+
+type testKernel struct{}
+
+func (k *testKernel) Cosine(a, b []float32) float32 { return 0 }
+func (k *testKernel) Dot(a, b []float32) float32    { return 0 }
+func (k *testKernel) Euclidean(a, b []float32) float32 { return 0 }
+
