@@ -11,7 +11,9 @@ require (
 
 require (
 	github.com/DataDog/zstd v1.4.5 // indirect
+	github.com/RoaringBitmap/roaring v1.9.4 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/bits-and-blooms/bitset v1.12.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cockroachdb/errors v1.11.3 // indirect
 	github.com/cockroachdb/fifo v0.0.0-20240606204812-0bbfbd93a7ce // indirect
@@ -29,6 +31,7 @@ require (
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
+	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.15.0 // indirect
@@ -38,7 +41,7 @@ require (
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
 	golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df // indirect
-	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
