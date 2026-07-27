@@ -1,106 +1,102 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "../components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
+import { Card, CardContent } from "../components/ui/card"
 import { Badge } from "../components/ui/badge"
 import { Search as SearchIcon } from "lucide-react"
-
-interface SearchResult {
-  id: string
-  score: number
-  preview: string
-  metadata?: Record<string, string>
-}
+import { searchCollection, fetchCollections, type SearchResult, type CollectionInfo } from "../lib/api"
 
 export default function SearchPage() {
+  const [collections, setCollections] = useState<CollectionInfo[]>([])
+  const [selectedCol, setSelectedCol] = useState("")
   const [query, setQuery] = useState("")
+  const [topK, setTopK] = useState(10)
   const [results, setResults] = useState<SearchResult[] | null>(null)
-  const [selected, setSelected] = useState<SearchResult | null>(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetchCollections().then(setCollections).catch(console.error)
+  }, [])
 
   async function handleSearch() {
-    if (!query.trim()) return
+    if (!selectedCol || !query.trim()) return
     setLoading(true)
-    // Simulate API call.
-    await new Promise((r) => setTimeout(r, 300))
-    setResults([
-      { id: "doc_123", score: 0.962, preview: "HNSW is a graph-based approximate nearest neighbor search algorithm...", metadata: { category: "AI", language: "EN" } },
-      { id: "doc_456", score: 0.941, preview: "Hierarchical Navigable Small World graphs provide efficient ANN search...", metadata: { category: "AI", language: "EN" } },
-      { id: "doc_789", score: 0.887, preview: "The HNSW algorithm builds a multi-layer graph structure for vector search...", metadata: { category: "ML", language: "EN" } },
-    ])
+    setError(null)
+    try {
+      const parts = query.split(",").map(Number)
+      const data = await searchCollection(selectedCol, parts, topK)
+      setResults(data)
+    } catch (e: any) {
+      setError(e.message)
+      setResults(null)
+    }
     setLoading(false)
-    setSelected(null)
   }
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">Search</h1>
-        <p className="text-sm text-zinc-500 mt-1">Explore your vector collections</p>
+        <p className="text-sm text-zinc-500 mt-1">Query vectors in your collections</p>
       </div>
 
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          placeholder="Search your collections..."
-          className="flex-1 h-10 px-3 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-400"
-        />
-        <Button onClick={handleSearch} disabled={loading}>
+      <div className="flex flex-wrap gap-2 items-end">
+        <div className="flex-1 min-w-[200px]">
+          <label className="text-xs font-medium text-zinc-500 block mb-1">Collection</label>
+          <select
+            value={selectedCol}
+            onChange={(e) => setSelectedCol(e.target.value)}
+            className="w-full h-10 px-3 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm"
+          >
+            <option value="">Select collection...</option>
+            {collections.map((c) => (
+              <option key={c.name} value={c.name}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex-[2] min-w-[300px]">
+          <label className="text-xs font-medium text-zinc-500 block mb-1">Query Vector (comma-separated)</label>
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="0.1, 0.2, 0.3, ..."
+            className="w-full h-10 px-3 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-zinc-400"
+          />
+        </div>
+        <div className="w-20">
+          <label className="text-xs font-medium text-zinc-500 block mb-1">Top K</label>
+          <input
+            type="number"
+            value={topK}
+            onChange={(e) => setTopK(Number(e.target.value))}
+            min={1}
+            max={100}
+            className="w-full h-10 px-3 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-center"
+          />
+        </div>
+        <Button onClick={handleSearch} disabled={loading || !selectedCol || !query.trim()}>
           <SearchIcon className="h-4 w-4 mr-1" />
           {loading ? "Searching..." : "Search"}
         </Button>
       </div>
 
-      {results && (
-        <div className="flex gap-4">
-          <div className="flex-1 space-y-2">
-            {results.map((r, i) => (
-              <Card
-                key={r.id}
-                className={`cursor-pointer transition-colors ${selected?.id === r.id ? "ring-2 ring-zinc-400 dark:ring-zinc-500" : ""}`}
-                onClick={() => setSelected(r)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-zinc-500">#{i + 1}</span>
-                    <Badge>{(r.score * 100).toFixed(0)}%</Badge>
-                  </div>
-                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{r.preview}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+      {error && <p className="text-sm text-red-500">{error}</p>}
 
-          {selected && (
-            <div className="w-72 shrink-0">
-              <Card>
-                <CardHeader><CardTitle>Details</CardTitle></CardHeader>
-                <CardContent className="space-y-3">
-                  <div>
-                    <p className="text-xs text-zinc-500">ID</p>
-                    <p className="text-sm font-mono text-zinc-900 dark:text-zinc-50">{selected.id}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-zinc-500">Score</p>
-                    <p className="text-sm font-mono text-zinc-900 dark:text-zinc-50">{selected.score.toFixed(3)}</p>
-                  </div>
-                  {selected.metadata && (
-                    <div>
-                      <p className="text-xs text-zinc-500 mb-1">Metadata</p>
-                      {Object.entries(selected.metadata).map(([k, v]) => (
-                        <div key={k} className="flex justify-between text-sm">
-                          <span className="text-zinc-500">{k}</span>
-                          <span className="text-zinc-900 dark:text-zinc-50">{v}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          )}
+      {results && (
+        <div className="space-y-2">
+          <p className="text-xs text-zinc-500">{results.length} result{results.length !== 1 ? "s" : ""}</p>
+          {results.map((r, i) => (
+            <Card key={r.id}>
+              <CardContent className="p-4 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <span className="text-sm text-zinc-400 font-mono">#{i + 1}</span>
+                  <span className="text-sm font-mono text-zinc-900 dark:text-zinc-50">ID: {r.id}</span>
+                </div>
+                <Badge>{(r.score * 100).toFixed(1)}%</Badge>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
     </div>
