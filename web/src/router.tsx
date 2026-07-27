@@ -6,7 +6,16 @@ import CollectionDetailPage from "./pages/collection-detail"
 import SearchPage from "./pages/search"
 import PerformancePage from "./pages/performance"
 import SettingsPage from "./pages/settings"
-import DocsPage from "./pages/docs"
+import DocsOverviewPage from "./pages/docs/overview"
+import GettingStartedPage from "./pages/docs/getting-started"
+import ArchitecturePage from "./pages/docs/architecture"
+import DenseEnginePage from "./pages/docs/dense-engine"
+import SparseEnginePage from "./pages/docs/sparse-engine"
+import MetadataEnginePage from "./pages/docs/metadata-engine"
+import StorageEnginePage from "./pages/docs/storage-engine"
+import SegmentManagerPage from "./pages/docs/segment-manager"
+import QueryPlannerPage from "./pages/docs/query-planner"
+import ApiReferencePage from "./pages/docs/api-reference"
 
 const rootRoute = createRootRoute({
   component: Layout,
@@ -51,7 +60,61 @@ const settingsRoute = createRoute({
 const docsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/docs",
-  component: DocsPage,
+  component: DocsOverviewPage,
+})
+
+const docsGettingStartedRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/docs/getting-started",
+  component: GettingStartedPage,
+})
+
+const docsArchitectureRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/docs/architecture",
+  component: ArchitecturePage,
+})
+
+const docsDenseEngineRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/docs/dense-engine",
+  component: DenseEnginePage,
+})
+
+const docsSparseEngineRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/docs/sparse-engine",
+  component: SparseEnginePage,
+})
+
+const docsMetadataEngineRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/docs/metadata-engine",
+  component: MetadataEnginePage,
+})
+
+const docsStorageEngineRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/docs/storage-engine",
+  component: StorageEnginePage,
+})
+
+const docsSegmentManagerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/docs/segment-manager",
+  component: SegmentManagerPage,
+})
+
+const docsQueryPlannerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/docs/query-planner",
+  component: QueryPlannerPage,
+})
+
+const docsApiReferenceRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/docs/api-reference",
+  component: ApiReferencePage,
 })
 
 const routeTree = rootRoute.addChildren([
@@ -62,6 +125,15 @@ const routeTree = rootRoute.addChildren([
   performanceRoute,
   settingsRoute,
   docsRoute,
+  docsGettingStartedRoute,
+  docsArchitectureRoute,
+  docsDenseEngineRoute,
+  docsSparseEngineRoute,
+  docsMetadataEngineRoute,
+  docsStorageEngineRoute,
+  docsSegmentManagerRoute,
+  docsQueryPlannerRoute,
+  docsApiReferenceRoute,
 ])
 
 const history = createHashHistory()
